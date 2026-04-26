@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: trend-service-python
+  namespace: crop-dashboard
+spec:
+  selector:
+    app: trend-service-python
+  ports:
+    - port: 5000
+      targetPort: 3003
+  type: ClusterIP    

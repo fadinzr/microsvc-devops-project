@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-service-go
+  namespace: crop-dashboard
+  labels:
+    app: data-service-go
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: data-service-go
+  template:
+    metadata:
+      labels:
+        app: data-service-go
+    spec:
+      containers:
+        - name: data-service-go
+          image: 969914074526.dkr.ecr.us-east-1.amazonaws.com/writer-service-node:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3002
+          env:
+            - name: MYSQL_HOST
+              value: "mysql-db.crop-dashboard.svc.cluster.local"   # Correct service DNS
+            - name: MYSQL_PORT
+              value: "3306"
+            - name: MYSQL_USER
+              value: "root"
+            - name: MYSQL_PASSWORD
+              value: "root"
+            - name: MYSQL_DATABASE
+              value: "cropdb"
+      imagePullSecrets:
+        - name: ecr-secret
+

@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-react
+  namespace: crop-dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend-react
+  template:
+    metadata:
+      labels:
+        app: frontend-react
+    spec:
+      containers:
+        - name: frontend-react
+          image: 969914074526.dkr.ecr.us-east-1.amazonaws.com/frontend-react:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10

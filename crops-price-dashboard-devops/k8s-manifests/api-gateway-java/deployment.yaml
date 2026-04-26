@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway-java
+  namespace: crop-dashboard
+  labels:
+    app: api-gateway-java
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-gateway-java
+  template:
+    metadata:
+      labels:
+        app: api-gateway-java
+    spec:
+      containers:
+        - name: api-gateway-java
+          image: 969914074526.dkr.ecr.us-east-1.amazonaws.com/api-gateway-java:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+
+      imagePullSecrets:
+        - name: ecr-secret

@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql_db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: cropdb
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - cropnet
+
+  # Go Service: Reads data from the DB
+  data-service-go:
+    build: ./data-service-go
+    restart: always
+    depends_on:
+      mysql_db:
+        condition: service_healthy
+    ports:
+      - "8081:8081"
+    networks:
+      - cropnet
+
+  # Python Service: Predicts crop price trend
+  trend-service-python:
+    build: ./trend-service-python
+    restart: always
+    ports:
+      - "5000:5000"
+    networks:
+      - cropnet
+
+  # Node.js Service: Writes data to DB
+  writer-service-node:
+    build: ./writer-service-node
+    restart: always
+    depends_on:
+      - mysql_db
+    ports:
+      - "3001:3001"
+    networks:
+      - cropnet
+
+  # Java Service: API Gateway
+  api-gateway-java:
+    build:
+      context: ./api-gateway-java
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - data-service-go
+      - trend-service-python
+    ports:
+      - "8080:8080"
+    networks:
+      - cropnet
+
+  # React Frontend
+  frontend-react:
+    build: ./frontend-react
+    restart: always
+    depends_on:
+      - api-gateway-java
+    ports:
+      - "3000:3000"
+    networks:
+      - cropnet
+
+networks:
+  cropnet:
+    driver: bridge
+

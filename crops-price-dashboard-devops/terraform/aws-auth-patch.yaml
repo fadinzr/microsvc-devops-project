@@ -1,0 +1,13 @@
+# aws-auth-patch.yaml
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aws-auth
+  namespace: kube-system
+data:
+  mapUsers: |
+    - userarn: arn:aws:iam::533267327324:user/sayeed
+      username: sayeed
+      groups:
+        - system:masters

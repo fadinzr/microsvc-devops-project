@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-service-go
+  namespace: crop-dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: data-service-go
+  template:
+    metadata:
+      labels:
+        app: data-service-go
+    spec:
+      containers:
+
+        - name: data-service-go
+          image: 969914074526.dkr.ecr.us-east-1.amazonaws.com/data-service-go:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3002
+          env:
+
+            - name: DB_HOST 
+              value: "mysql-db" 
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_USER
+              value: "root"
+            - name: DB_PASSWORD
+              value: "root"
+            - name: DB_NAME
+              value: "cropdb"
+        
+        # 2. The Sidecar Proxy Container (The Fixer)
+        # - name: mysql-proxy-fixer
+        #   image: alpine/socat:latest 
+        #   command: ["sh", "-c"]
+        #   args:
+        #     # socat: Listen on port 3306 (which the Go app connects to) 
+        #     # and forward all traffic to the actual service name (mysql-db:3306).
+        #     - "socat TCP-LISTEN:3306,fork TCP:mysql-db:3306"
+        #   resources: 
+        #     limits:
+        #       cpu: 10m
+        #       memory: 20Mi
+
+      # imagePullSecrets:
+      #   - name: ecr-secret
